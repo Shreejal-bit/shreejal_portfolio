@@ -26,6 +26,7 @@ import {
   Menu,
   X,
   Car,
+  Plane,
 } from "lucide-react";
 import AnimatedBackground from "./components/AnimatedBackground";
 
@@ -1096,6 +1097,49 @@ export default function Home() {
                       ))}
                     </div>
                     <div className="flex items-center gap-2 text-cyan-400 text-sm font-medium">
+                      <ExternalLink className="w-4 h-4" />
+                      <span>View on Figma</span>
+                    </div>
+                  </div>
+                </a>
+
+                {/* Project 3 - Travel Agency */}
+                <a
+                  href="https://www.figma.com/proto/NvsmC0UNbGwXNN9HjcHhAU/portfoiio?node-id=4214-7619&t=kN5waItPC341CSK0-1"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="glass rounded-2xl overflow-hidden glow-subtle hover:glow transition-all duration-300 hover:scale-[1.02] cursor-pointer group block"
+                >
+                  <div className="relative h-48 bg-gradient-to-br from-emerald-500/20 to-teal-500/20">
+                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/30 to-teal-600/30 opacity-60 group-hover:opacity-70 transition-opacity" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Plane className="w-16 h-16 text-emerald-400 drop-shadow-[0_0_15px_rgba(52,211,153,0.8)]" />
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="p-2 bg-emerald-500/20 rounded-lg">
+                        <Plane className="w-5 h-5 text-emerald-400" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold group-hover:text-emerald-400 transition-colors">Travel Agency</h3>
+                        <p className="text-xs text-muted-foreground">Figma Design Project</p>
+                      </div>
+                    </div>
+                    <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
+                      Modern travel booking website design in Figma featuring destination showcases, booking interface, and travel packages.
+                    </p>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {["Figma", "UI Design", "Prototype"].map((tech) => (
+                        <span
+                          key={tech}
+                          className="px-2 py-1 text-xs rounded-full bg-secondary text-secondary-foreground"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-2 text-emerald-400 text-sm font-medium">
                       <ExternalLink className="w-4 h-4" />
                       <span>View on Figma</span>
                     </div>
