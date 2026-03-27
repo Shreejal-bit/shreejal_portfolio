@@ -16,6 +16,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Portfolio | UI/UX Designer",
   description: "Creative UI/UX Designer with expertise in Figma, Canva, and modern web technologies. Former intern at Gecko Works Nepal.",
+  icons: {
+    icon: "logo.png"
+  },
 };
 
 export default function RootLayout({

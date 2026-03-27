@@ -25,6 +25,7 @@ import {
   Cpu,
   Menu,
   X,
+  Car,
 } from "lucide-react";
 import AnimatedBackground from "./components/AnimatedBackground";
 
@@ -186,12 +187,36 @@ export default function Home() {
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Message sent successfully!", {
-      description: "Thank you for reaching out. I'll get back to you soon.",
-    });
-    setFormData({ name: "", email: "", message: "" });
+    setIsSubmitting(true);
+    
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        toast.success("Message sent successfully!", {
+          description: "Thank you for reaching out. I'll get back to you soon.",
+        });
+        setFormData({ name: "", email: "", message: "" });
+      } else {
+        toast.error("Failed to send message", {
+          description: "Please try again later.",
+        });
+      }
+    } catch (error) {
+      toast.error("Something went wrong", {
+        description: "Please try again later.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleResumeDownload = () => {
@@ -234,102 +259,192 @@ export default function Home() {
             transition={{ duration: 0.8, ease: "easeInOut" }}
             className="fixed inset-0 z-[200] bg-[#0a0a0a] flex flex-col items-center justify-center"
           >
-            {/* Glowing orb animation */}
+            {/* Modern Logo Animation */}
             <motion.div
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ 
-                scale: [0.5, 1.2, 1],
-                opacity: 1,
-              }}
-              transition={{ 
-                duration: 2,
-                ease: "easeInOut",
-              }}
-              className="relative"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="relative flex flex-col items-center"
             >
-              {/* Outer glow rings */}
-              <motion.div
-                animate={{ 
-                  rotate: 360,
-                  scale: [1, 1.1, 1],
-                }}
-                transition={{ 
-                  rotate: { duration: 3, repeat: Infinity, ease: "linear" },
-                  scale: { duration: 2, repeat: Infinity, ease: "easeInOut" }
-                }}
-                className="w-40 h-40 rounded-full border-2 border-primary/30"
-                style={{
-                  boxShadow: "0 0 60px rgba(139, 92, 246, 0.5), 0 0 120px rgba(236, 72, 153, 0.3), inset 0 0 60px rgba(139, 92, 246, 0.2)"
-                }}
-              />
-              <motion.div
-                animate={{ 
-                  rotate: -360,
-                  scale: [1, 0.9, 1],
-                }}
-                transition={{ 
-                  rotate: { duration: 2.5, repeat: Infinity, ease: "linear" },
-                  scale: { duration: 1.5, repeat: Infinity, ease: "easeInOut" }
-                }}
-                className="absolute inset-4 rounded-full border-2 border-accent/40"
-                style={{
-                  boxShadow: "0 0 40px rgba(236, 72, 153, 0.4), inset 0 0 40px rgba(236, 72, 153, 0.2)"
-                }}
-              />
-              {/* Center core */}
-              <motion.div
-                animate={{ 
-                  scale: [1, 1.3, 1],
-                  opacity: [1, 0.8, 1]
-                }}
-                transition={{ 
-                  duration: 1.5, 
-                  repeat: Infinity, 
-                  ease: "easeInOut" 
-                }}
-                className="absolute inset-0 flex items-center justify-center"
-              >
-                <div 
-                  className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent"
+              {/* 3D rotating ring container */}
+              <div className="relative" style={{ perspective: "1000px" }}>
+                {/* Outer rotating ring */}
+                <motion.div
+                  animate={{ rotateZ: 360 }}
+                  transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-0 -m-8 rounded-full"
                   style={{
-                    boxShadow: "0 0 50px rgba(139, 92, 246, 0.8), 0 0 100px rgba(236, 72, 153, 0.6), 0 0 150px rgba(139, 92, 246, 0.4)"
+                    background: "conic-gradient(from 0deg, transparent, rgba(139, 92, 246, 0.4), rgba(236, 72, 153, 0.4), rgba(139, 92, 246, 0.4), transparent)",
+                    mask: "radial-gradient(circle, transparent 65%, black 66%, black 70%, transparent 71%)",
+                    WebkitMask: "radial-gradient(circle, transparent 65%, black 66%, black 70%, transparent 71%)",
                   }}
                 />
+                
+                {/* Second ring - opposite rotation */}
+                <motion.div
+                  animate={{ rotateZ: -360 }}
+                  transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-0 -m-12 rounded-full opacity-60"
+                  style={{
+                    background: "conic-gradient(from 180deg, transparent, rgba(236, 72, 153, 0.3), rgba(139, 92, 246, 0.3), rgba(236, 72, 153, 0.3), transparent)",
+                    mask: "radial-gradient(circle, transparent 70%, black 71%, black 75%, transparent 76%)",
+                    WebkitMask: "radial-gradient(circle, transparent 70%, black 71%, black 75%, transparent 76%)",
+                  }}
+                />
+                
+                {/* Glow effect behind logo */}
+                <motion.div
+                  animate={{ 
+                    scale: [1, 1.2, 1],
+                    opacity: [0.3, 0.6, 0.3]
+                  }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute inset-0 -m-6 rounded-full blur-3xl"
+                  style={{
+                    background: "radial-gradient(circle, rgba(139, 92, 246, 0.5) 0%, rgba(236, 72, 153, 0.3) 50%, transparent 70%)"
+                  }}
+                />
+                
+                {/* Logo container - clean, no box */}
+                <motion.div
+                  animate={{ 
+                    rotateY: [0, 8, 0, -8, 0],
+                    rotateX: [0, 5, 0, -5, 0],
+                  }}
+                  transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                  className="relative z-10"
+                  style={{ transformStyle: "preserve-3d" }}
+                >
+                  <motion.img 
+                    src="logo.png" 
+                    alt="Shreejal"
+                    className="w-44 h-44 object-contain"
+                    animate={{ 
+                      scale: [1, 1.05, 1],
+                      filter: [
+                        "drop-shadow(0 0 40px rgba(139, 92, 246, 0.8)) drop-shadow(0 0 80px rgba(236, 72, 153, 0.5)) brightness(1)",
+                        "drop-shadow(0 0 60px rgba(139, 92, 246, 1)) drop-shadow(0 0 120px rgba(236, 72, 153, 0.8)) brightness(1.15)",
+                        "drop-shadow(0 0 40px rgba(139, 92, 246, 0.8)) drop-shadow(0 0 80px rgba(236, 72, 153, 0.5)) brightness(1)"
+                      ]
+                    }}
+                    transition={{ 
+                      duration: 2, 
+                      repeat: Infinity, 
+                      ease: "easeInOut" 
+                    }}
+                  />
+                </motion.div>
+                
+                {/* Floating particles */}
+                {[...Array(6)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    className="absolute w-1.5 h-1.5 rounded-full"
+                    style={{
+                      background: i % 2 === 0 
+                        ? "linear-gradient(135deg, #8b5cf6, #ec4899)" 
+                        : "linear-gradient(135deg, #ec4899, #8b5cf6)",
+                      top: "50%",
+                      left: "50%",
+                    }}
+                    animate={{ 
+                      x: [0, Math.cos(i * Math.PI / 3) * 100, 0],
+                      y: [0, Math.sin(i * Math.PI / 3) * 100, 0],
+                      scale: [0.5, 1.2, 0.5],
+                      opacity: [0, 1, 0]
+                    }}
+                    transition={{ 
+                      duration: 3,
+                      repeat: Infinity,
+                      delay: i * 0.5,
+                      ease: "easeInOut"
+                    }}
+                  />
+                ))}
+              </div>
+              
+              {/* Modern loading text */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                className="mt-10 text-center"
+              >
+                <motion.h2 
+                  className="text-3xl md:text-4xl font-bold mb-3"
+                  style={{
+                    background: "linear-gradient(135deg, #fff 0%, #8b5cf6 50%, #ec4899 100%)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text"
+                  }}
+                  animate={{ 
+                    backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"]
+                  }}
+                  transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+                >
+                  Welcome
+                </motion.h2>
+                
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.6 }}
+                  className="text-sm text-muted-foreground tracking-widest uppercase mb-6"
+                >
+                  <motion.span
+                    animate={{ opacity: [0.4, 1, 0.4] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    Loading Portfolio
+                  </motion.span>
+                </motion.p>
+                
+                {/* Progress bar */}
+                <div className="w-64 h-1 bg-secondary/50 rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: "0%" }}
+                    animate={{ width: "100%" }}
+                    transition={{ duration: 3, ease: "easeInOut" }}
+                    className="h-full rounded-full"
+                    style={{
+                      background: "linear-gradient(90deg, #8b5cf6, #ec4899, #8b5cf6)",
+                      backgroundSize: "200% 100%"
+                    }}
+                  />
+                </div>
+                
+                {/* Percentage */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.8 }}
+                  className="mt-3 font-mono text-xs text-muted-foreground"
+                >
+                  <motion.span
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: [0, 1, 1, 0] }}
+                    transition={{ duration: 3, times: [0, 0.3, 0.7, 1] }}
+                  >
+                    {["0%", "32%", "68%", "100%"].map((pct, i) => (
+                      <motion.span
+                        key={pct}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: [0, 1, 1, 0], y: [10, 0, 0, -10] }}
+                        transition={{ 
+                          duration: 0.75, 
+                          delay: i * 0.75,
+                          times: [0, 0.1, 0.9, 1]
+                        }}
+                        className="absolute left-1/2 -translate-x-1/2"
+                      >
+                        {pct}
+                      </motion.span>
+                    ))}
+                  </motion.span>
+                </motion.div>
               </motion.div>
             </motion.div>
-            
-            {/* Loading text */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.8 }}
-              className="mt-12 text-center"
-            >
-              <h2 className="text-2xl font-bold gradient-text mb-2">Loading Experience</h2>
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: "100%" }}
-                transition={{ duration: 3, ease: "easeInOut" }}
-                className="h-1 bg-gradient-to-r from-primary to-accent rounded-full"
-                style={{ width: 200 }}
-              />
-            </motion.div>
-            
-            {/* Loading percentage */}
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="mt-4 text-sm text-muted-foreground font-mono"
-            >
-              <motion.span
-                initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 1, 1, 0] }}
-                transition={{ duration: 3, times: [0, 0.3, 0.6, 1] }}
-              >
-                Initializing...
-              </motion.span>
-            </motion.p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -944,9 +1059,9 @@ export default function Home() {
                   </div>
                 </a>
 
-                {/* Project 2 - Portfolio Website */}
+                {/* Project 2 - Car Website */}
                 <a
-                  href="https://your-portfolio-demo.com"
+                  href="https://www.figma.com/proto/NvsmC0UNbGwXNN9HjcHhAU/portfoiio?node-id=3809-3968&t=kN5waItPC341CSK0-1"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="glass rounded-2xl overflow-hidden glow-subtle hover:glow transition-all duration-300 hover:scale-[1.02] cursor-pointer group block"
@@ -954,24 +1069,24 @@ export default function Home() {
                   <div className="relative h-48 bg-gradient-to-br from-blue-500/20 to-cyan-500/20">
                     <div className="absolute inset-0 bg-gradient-to-br from-blue-600/30 to-cyan-600/30 opacity-60 group-hover:opacity-70 transition-opacity" />
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <Globe className="w-16 h-16 text-cyan-400 drop-shadow-[0_0_15px_rgba(34,211,238,0.8)]" />
+                      <Car className="w-16 h-16 text-cyan-400 drop-shadow-[0_0_15px_rgba(34,211,238,0.8)]" />
                     </div>
                   </div>
                   <div className="p-6">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="p-2 bg-cyan-500/20 rounded-lg">
-                        <Globe className="w-5 h-5 text-cyan-400" />
+                        <Car className="w-5 h-5 text-cyan-400" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold group-hover:text-cyan-400 transition-colors">Portfolio Website</h3>
-                        <p className="text-xs text-muted-foreground">Personal Project</p>
+                        <h3 className="text-lg font-bold group-hover:text-cyan-400 transition-colors">Car Website</h3>
+                        <p className="text-xs text-muted-foreground">Figma Design Project</p>
                       </div>
                     </div>
                     <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
-                      Modern animated portfolio with Next.js, featuring smooth scroll animations and dark theme.
+                      Modern car showcase website design in Figma featuring sleek UI, car gallery, and booking interface.
                     </p>
                     <div className="flex flex-wrap gap-2 mb-4">
-                      {["Next.js", "TypeScript", "Framer Motion"].map((tech) => (
+                      {["Figma", "UI Design", "Prototype"].map((tech) => (
                         <span
                           key={tech}
                           className="px-2 py-1 text-xs rounded-full bg-secondary text-secondary-foreground"
@@ -982,7 +1097,7 @@ export default function Home() {
                     </div>
                     <div className="flex items-center gap-2 text-cyan-400 text-sm font-medium">
                       <ExternalLink className="w-4 h-4" />
-                      <span>View Project</span>
+                      <span>View on Figma</span>
                     </div>
                   </div>
                 </a>
@@ -1163,6 +1278,7 @@ export default function Home() {
                         className="w-full px-4 py-3 bg-secondary rounded-lg border border-border focus:border-primary focus:outline-none transition-colors"
                         placeholder="your@email.com"
                         required
+                        suppressHydrationWarning
                       />
                     </div>
                     <div>
@@ -1178,10 +1294,20 @@ export default function Home() {
                     </div>
                     <button
                       type="submit"
-                      className="w-full flex items-center justify-center gap-2 px-8 py-4 bg-primary text-primary-foreground rounded-full font-medium hover:glow transition-all"
+                      disabled={isSubmitting}
+                      className="w-full flex items-center justify-center gap-2 px-8 py-4 bg-primary text-primary-foreground rounded-full font-medium hover:glow transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <Send className="w-4 h-4" />
-                      Send Message
+                      {isSubmitting ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          Sending...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-4 h-4" />
+                          Send Message
+                        </>
+                      )}
                     </button>
                   </div>
                 </form>
@@ -1196,7 +1322,7 @@ export default function Home() {
                     </div>
                     <div>
                       <h3 className="font-semibold mb-1">Email</h3>
-                      <p className="text-muted-foreground">your.email@example.com</p>
+                      <p className="text-muted-foreground">sthapitshrijal404@gmail.com</p>
                     </div>
                   </div>
 
@@ -1234,24 +1360,55 @@ export default function Home() {
                 <div className="mt-12 pt-8 border-t border-border">
                   <p className="text-sm text-muted-foreground mb-4">Or connect with me on social media</p>
                   <div className="flex gap-4">
-                    {[Github, Linkedin, Figma].map((Icon, index) => (
-                      <a
-                        key={index}
-                        href="#"
-                        className="p-3 glass rounded-full transition-all duration-300 hover:scale-110 cursor-pointer group relative overflow-hidden"
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.boxShadow = "0 0 20px rgba(139, 92, 246, 0.5), 0 0 40px rgba(236, 72, 153, 0.3), inset 0 0 15px rgba(139, 92, 246, 0.1)";
-                          e.currentTarget.style.borderColor = "rgba(139, 92, 246, 0.5)";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.boxShadow = "";
-                          e.currentTarget.style.borderColor = "";
-                        }}
-                      >
-                        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                        <Icon className="w-5 h-5 relative z-10 group-hover:text-primary transition-colors" />
-                      </a>
-                    ))}
+                    <a
+                      href="https://github.com/Shreejal-bit"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-3 glass rounded-full transition-all duration-300 hover:scale-110 cursor-pointer group relative overflow-hidden"
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.boxShadow = "0 0 20px rgba(139, 92, 246, 0.5), 0 0 40px rgba(236, 72, 153, 0.3), inset 0 0 15px rgba(139, 92, 246, 0.1)";
+                        e.currentTarget.style.borderColor = "rgba(139, 92, 246, 0.5)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.boxShadow = "";
+                        e.currentTarget.style.borderColor = "";
+                      }}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <Github className="w-5 h-5 relative z-10 group-hover:text-primary transition-colors" />
+                    </a>
+                    <a
+                      href="https://www.linkedin.com/in/shrijal-sthapit-214107399/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-3 glass rounded-full transition-all duration-300 hover:scale-110 cursor-pointer group relative overflow-hidden"
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.boxShadow = "0 0 20px rgba(139, 92, 246, 0.5), 0 0 40px rgba(236, 72, 153, 0.3), inset 0 0 15px rgba(139, 92, 246, 0.1)";
+                        e.currentTarget.style.borderColor = "rgba(139, 92, 246, 0.5)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.boxShadow = "";
+                        e.currentTarget.style.borderColor = "";
+                      }}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <Linkedin className="w-5 h-5 relative z-10 group-hover:text-primary transition-colors" />
+                    </a>
+                    <a
+                      href="#"
+                      className="p-3 glass rounded-full transition-all duration-300 hover:scale-110 cursor-pointer group relative overflow-hidden"
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.boxShadow = "0 0 20px rgba(139, 92, 246, 0.5), 0 0 40px rgba(236, 72, 153, 0.3), inset 0 0 15px rgba(139, 92, 246, 0.1)";
+                        e.currentTarget.style.borderColor = "rgba(139, 92, 246, 0.5)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.boxShadow = "";
+                        e.currentTarget.style.borderColor = "";
+                      }}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <Figma className="w-5 h-5 relative z-10 group-hover:text-primary transition-colors" />
+                    </a>
                   </div>
                 </div>
               </motion.div>
