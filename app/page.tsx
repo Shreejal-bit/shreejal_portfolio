@@ -23,35 +23,12 @@ import {
   Briefcase,
   Globe,
   Cpu,
-  Menu,
-  X,
   Car,
   Plane,
+  FolderOpen,
+  Wrench,
 } from "lucide-react";
 import AnimatedBackground from "./components/AnimatedBackground";
-
-// Typing animation hook
-function useTyping(text: string, speed: number = 100) {
-  const [displayText, setDisplayText] = useState("");
-  const [isComplete, setIsComplete] = useState(false);
-
-  useEffect(() => {
-    let index = 0;
-    const timer = setInterval(() => {
-      if (index < text.length) {
-        setDisplayText(text.slice(0, index + 1));
-        index++;
-      } else {
-        setIsComplete(true);
-        clearInterval(timer);
-      }
-    }, speed);
-
-    return () => clearInterval(timer);
-  }, [text, speed]);
-
-  return { displayText, isComplete };
-}
 
 // Typewriter animation component
 function TypewriterText({ text, className }: { text: string; className?: string }) {
@@ -91,28 +68,6 @@ function TypewriterText({ text, className }: { text: string; className?: string 
     </span>
   );
 }
-
-// Testimonials data
-const testimonials = [
-  {
-    name: "Team Lead",
-    role: "Gecko Works Nepal",
-    content: "Exceptional UI/UX skills in Figma. Delivered high-quality designs consistently during the internship.",
-    rating: 5,
-  },
-  {
-    name: "Project Supervisor",
-    role: "University",
-    content: "The Online Shoes Store project demonstrated impressive full-stack capabilities and attention to detail.",
-    rating: 5,
-  },
-  {
-    name: "Design Mentor",
-    role: "Canva Expert",
-    content: "Quick learner with excellent eye for design. Created stunning marketing materials for our campaigns.",
-    rating: 5,
-  },
-];
 
 const fadeInUp = {
   initial: { opacity: 0, y: 60 },
@@ -164,10 +119,7 @@ const staggerContainer = {
 export default function Home() {
   const { scrollYProgress } = useScroll();
   const [showBackToTop, setShowBackToTop] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mobileMenuLoading, setMobileMenuLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
-  const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const timelineRef = useRef<HTMLDivElement>(null);
 
@@ -232,21 +184,6 @@ export default function Home() {
     toast.success("Resume download started!", {
       description: "Your resume is being downloaded.",
     });
-  };
-
-  // Handle mobile menu open with loading animation
-  const handleMobileMenuToggle = () => {
-    if (!mobileMenuOpen) {
-      setMobileMenuLoading(true);
-      setMobileMenuOpen(true);
-      // Simulate loading for 800ms then show content
-      setTimeout(() => {
-        setMobileMenuLoading(false);
-      }, 800);
-    } else {
-      setMobileMenuOpen(false);
-      setMobileMenuLoading(false);
-    }
   };
 
   return (
@@ -456,91 +393,139 @@ export default function Home() {
       {/* Scroll Progress Bar */}
       <motion.div className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-500 z-[100] origin-left" style={{ scaleX: scrollYProgress }} />
       
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 glass">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="text-xl font-bold gradient-text"
+      {/* Navigation - Floating Pill Style */}
+      <nav className="fixed top-6 left-0 right-0 z-50 flex justify-center">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="hidden md:flex items-center gap-1 px-8 py-3 rounded-full"
+          style={{
+            background: 'rgba(255, 255, 255, 0.05)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
+          }}
+        >
+          {/* Logo */}
+          <a 
+            href="#" 
+            onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+            className="flex items-center justify-center w-12 h-12 rounded-full mr-1 cursor-pointer"
           >
-            <a href="/" className="cursor-pointer hover:opacity-80 transition-opacity">
-              <img src="logo.png" alt="Logo" className="w-40 h-12" />
-            </a>
-          </motion.div>
-          
-          {/* Desktop Navigation */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="hidden md:flex gap-6 text-sm text-muted-foreground"
+            <img src="logo.png" alt="Logo" className="w-10 h-10 object-contain" />
+          </a>
+
+          {/* Divider */}
+          <div className="w-px h-6 bg-white/10 mx-1" />
+
+          {/* Nav Items */}
+          <div className="flex items-center gap-1 px-2">
+            {[
+              { name: 'About', href: '#about' },
+              { name: 'Experience', href: '#experience' },
+              { name: 'Projects', href: '#projects' },
+              { name: 'Skills', href: '#skills' },
+              { name: 'Contact', href: '#contact' },
+            ].map((item) => (
+              <a
+                key={item.name}
+                href={item.href}
+                className="px-4 py-2 text-sm text-white/70 hover:text-white rounded-full hover:bg-white/10 transition-all duration-300"
+              >
+                {item.name}
+              </a>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Mobile Header - Logo only */}
+        <div className="md:hidden fixed top-4 left-4 z-50">
+          <a 
+            href="#" 
+            onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+            className="cursor-pointer"
           >
-            {["About", "Experience", "Projects", "Skills", "Contact"].map(
-              (item) => (
-                <a
-                  key={item}
-                  href={`#${item.toLowerCase()}`}
-                  className="hover:text-primary transition-colors"
-                >
-                  {item}
-                </a>
-              )
-            )}
-          </motion.div>
-          
-          {/* Mobile Hamburger Button */}
-          <button
-            onClick={handleMobileMenuToggle}
-            className="md:hidden p-2 text-primary"
-            aria-label="Toggle menu"
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+            
+          </a>
         </div>
-        
-        {/* Mobile Menu */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="md:hidden glass border-t border-border"
-            >
-              {mobileMenuLoading ? (
-                // Loading Animation
-                <div className="px-6 py-8 flex flex-col items-center justify-center">
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                    className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full"
-                  />
-                  <p className="text-sm text-muted-foreground mt-4">Loading menu...</p>
-                </div>
-              ) : (
-                // Menu Content
-                <div className="px-6 py-4 flex flex-col gap-4">
-                  {["About", "Experience", "Projects", "Skills", "Contact"].map(
-                    (item) => (
-                      <a
-                        key={item}
-                        href={`#${item.toLowerCase()}`}
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="text-sm text-muted-foreground hover:text-primary transition-colors py-2"
-                      >
-                        {item}
-                      </a>
-                    )
-                  )}
-                </div>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
       </nav>
 
+      {/* Mobile Bottom Navigation */}
+      <div className="md:hidden fixed bottom-6 left-0 right-0 z-50 flex justify-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-2 px-3 py-3 rounded-full"
+          style={{
+            background: 'rgba(20, 20, 20, 0.8)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(139, 92, 246, 0.2)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
+          }}
+        >
+          {/* Projects */}
+          <a 
+            href="#projects" 
+            className="flex flex-col items-center gap-1 px-3 py-1 text-white/60 hover:text-primary transition-colors"
+          >
+            <FolderOpen className="w-5 h-5" />
+            <span className="text-[10px] tracking-wide">Projects</span>
+          </a>
+
+          {/* About */}
+          <a 
+            href="#about" 
+            className="flex flex-col items-center gap-1 px-3 py-1 text-white/60 hover:text-primary transition-colors"
+          >
+            <User className="w-5 h-5" />
+            <span className="text-[10px] tracking-wide">About</span>
+          </a>
+
+          {/* Logo - Center with rotating ring effect */}
+          <a 
+            href="#" 
+            onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+            className="relative flex flex-col items-center justify-center w-16 h-16 -mt-6"
+          >
+            {/* Rotating conic gradient ring */}
+            <div 
+              className="absolute inset-0 rounded-full animate-spin"
+              style={{ 
+                background: 'conic-gradient(from 0deg, transparent, #8b5cf6, #ec4899, #8b5cf6, transparent)',
+                mask: 'radial-gradient(circle, transparent 58%, black 59%, black 62%, transparent 63%)',
+                WebkitMask: 'radial-gradient(circle, transparent 58%, black 59%, black 62%, transparent 63%)',
+                animationDuration: '3s'
+              }} 
+            />
+            {/* Inner circle with logo */}
+            <div className="relative w-12 h-12 rounded-full bg-[#141414] flex items-center justify-center overflow-hidden">
+              <img src="logo.png" alt="Logo" className="w-10 h-10 object-contain" />
+            </div>
+          </a>
+
+          {/* Skills */}
+          <a 
+            href="#skills" 
+            className="flex flex-col items-center gap-1 px-3 py-1 text-white/60 hover:text-primary transition-colors"
+          >
+            <Wrench className="w-5 h-5" />
+            <span className="text-[10px] tracking-wide">Skills</span>
+          </a>
+
+          {/* Contact */}
+          <a 
+            href="#contact" 
+            className="flex flex-col items-center gap-1 px-3 py-1 text-white/60 hover:text-primary transition-colors"
+          >
+            <Mail className="w-5 h-5" />
+            <span className="text-[10px] tracking-wide">Contact</span>
+          </a>
+        </motion.div>
+      </div>
+
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center px-6 pt-24 z-10">
+      <section className="relative min-h-screen flex items-center justify-center px-4 pt-24 z-10">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -659,53 +644,64 @@ export default function Home() {
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-32 px-6">
+      <section id="about" className="py-32 px-6 md:px-8 lg:px-12">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial="initial"
             whileInView="animate"
             viewport={{ once: true, margin: "-100px" }}
             variants={staggerContainer}
-            className="grid md:grid-cols-2 gap-16 items-center"
+            className="grid md:grid-cols-2 gap-12 lg:gap-16 items-center"
           >
             <motion.div variants={fadeInUp}>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6"
+                style={{
+                  background: 'rgba(139, 92, 246, 0.1)',
+                  border: '1px solid rgba(139, 92, 246, 0.2)'
+                }}
+              >
                 <Sparkles className="w-4 h-4 text-primary" />
                 <span className="text-sm">About Me</span>
               </div>
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">
-                Passionate about creating{" "}
-                <span className="gradient-text">impactful designs</span>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight">
+                Passionate about<br />
+                creating <span className="gradient-text">impactful designs</span>
               </h2>
-              <p className="text-muted-foreground text-lg leading-relaxed mb-6">
+              <p className="text-white/60 text-base leading-relaxed mb-4">
                 I am a creative designer and developer with a strong foundation
                 in UI/UX design. My journey began with
                 a 3-month internship at Gecko Works Nepal, where I honed my
                 skills in Figma and Canva while working on real-world projects.
               </p>
-              <p className="text-muted-foreground text-lg leading-relaxed mb-8">
+              <p className="text-white/60 text-base leading-relaxed mb-8">
                 During my bachelor&apos;s, I developed a comprehensive Online
                 Shoes Store as my major project, showcasing my ability to build
                 complete full-stack applications from design to deployment.
               </p>
 
-              {/* Quick Info */}
-              <div className="flex flex-wrap gap-4">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <MapPin className="w-4 h-4 text-primary" />
-                  <span>Based in Nepal</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Briefcase className="w-4 h-4 text-primary" />
-                  <span>Open to work</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Globe className="w-4 h-4 text-primary" />
-                  <span>Remote friendly</span>
-                </div>
+              {/* Quick Info Pills */}
+              <div className="flex flex-wrap gap-3">
+                {[
+                  { icon: MapPin, text: "Based in Nepal" },
+                  { icon: Briefcase, text: "Open to work" },
+                  { icon: Globe, text: "Remote friendly" },
+                ].map((item, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 px-4 py-2 rounded-full text-sm"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      border: '1px solid rgba(255, 255, 255, 0.08)'
+                    }}
+                  >
+                    <item.icon className="w-4 h-4 text-primary" />
+                    <span className="text-white/70">{item.text}</span>
+                  </div>
+                ))}
               </div>
             </motion.div>
 
+            {/* Stats Grid */}
             <motion.div
               variants={fadeInUp}
               className="grid grid-cols-2 gap-4"
@@ -717,27 +713,20 @@ export default function Home() {
               ].map((stat, index) => (
                 <div
                   key={index}
-                  className="p-6 glass rounded-2xl text-center transition-all duration-300 hover:scale-105 hover:-translate-y-1 cursor-pointer group relative overflow-hidden"
+                  className={`p-6 rounded-2xl text-center transition-all duration-300 hover:scale-105 ${
+                    index === 2 ? 'col-span-2 md:col-span-1' : ''
+                  }`}
                   style={{
-                    transition: "all 0.3s ease, box-shadow 0.3s ease"
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.boxShadow = "0 0 30px rgba(139, 92, 246, 0.5), 0 0 60px rgba(236, 72, 153, 0.3), inset 0 0 20px rgba(139, 92, 246, 0.1)";
-                    e.currentTarget.style.borderColor = "rgba(139, 92, 246, 0.5)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.boxShadow = "";
-                    e.currentTarget.style.borderColor = "";
+                    background: 'rgba(20, 20, 25, 0.6)',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)'
                   }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="relative z-10">
-                    <div className="text-3xl font-bold gradient-text mb-2 group-hover:scale-110 transition-transform duration-300 drop-shadow-[0_0_10px_rgba(139,92,246,0.5)]">
-                      {stat.value}
-                    </div>
-                    <div className="text-sm text-muted-foreground group-hover:text-foreground transition-colors duration-300">
-                      {stat.label}
-                    </div>
+                  <div className="text-3xl font-bold gradient-text mb-2">
+                    {stat.value}
+                  </div>
+                  <div className="text-sm text-white/50">
+                    {stat.label}
                   </div>
                 </div>
               ))}
@@ -747,7 +736,7 @@ export default function Home() {
       </section>
 
       {/* Experience Section */}
-      <section id="experience" className="py-32 px-6 bg-secondary/30">
+      <section id="experience" className="py-32 px-8 md:px-16 lg:px-24 bg-secondary/30">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial="initial"
@@ -997,7 +986,7 @@ export default function Home() {
       </section>
 
       {/* Projects Section */}
-      <section id="projects" className="py-32 px-6">
+      <section id="projects" className="py-32 px-8 md:px-16 lg:px-24">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial="initial"
@@ -1152,7 +1141,7 @@ export default function Home() {
       </section>
 
       {/* Skills Section */}
-      <section id="skills" className="py-32 px-6 bg-secondary/30">
+      <section id="skills" className="py-32 px-8 md:px-16 lg:px-24 bg-secondary/30">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial="initial"
@@ -1276,7 +1265,7 @@ export default function Home() {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-32 px-6 bg-secondary/30">
+      <section id="contact" className="py-32 px-8 md:px-16 lg:px-24 bg-secondary/30">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial="initial"
@@ -1462,7 +1451,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-6 border-t border-border">
+      <footer className="py-8 px-8 md:px-16 lg:px-24 border-t border-border">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
             © 2024 Portfolio. All rights reserved.
